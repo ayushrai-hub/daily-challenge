@@ -1,0 +1,71 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+dev-debug.log
+
+# Dependency directories
+node_modules/
+*.pyc
+__pycache__
+# Environment variables
+.env
+.env.production
+
+# Editor directories and files
+.idea
+.vscode
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# OS specific
+.DS_Store
+
+# Virtual environment
+venv/
+
+#Below this line, all files shall not be tracked by git but shall be used for cascade (use wisely)
+
+tasks.json
+/tasks/
+.env__pycache__/
+*.py[cod]
+*.class
+.pytest_cache/
+logs/
+.coverage
+htmlcov/
+.env.test
+
+# Celery
+celerybeat-schedule
+celerybeat-schedule.db
+
+# Backup files
+*.bak
+alembic/versions_backup*
+# Testing and debugging scripts
+scripts/create_admin_user.py
+scripts/debug_gemini.py
+scripts/direct_test_claude.py
+scripts/direct_test_gemini.py
+scripts/fix_tag_parents.py
+scripts/list_gemini_models.py
+scripts/setup_tag_hierarchy.py
+scripts/setup_tag_hierarchy_sql.py
+scripts/test_gemini.py
+scripts/test_gemini_provider.py
+
+# Backup files
+frontend/src/pages/*.bak*
+frontend/src/pages/*.old
+
+app/scripts/export_problems_for_review.py
+app/scripts/export_problems_to_markdown.py
+app/scripts/output/problems_review_20250520_123022.md
+app/scripts/output/problems_review_20250520_123125.md

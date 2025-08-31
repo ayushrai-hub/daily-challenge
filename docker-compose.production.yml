@@ -1,0 +1,193 @@
+version: '3.9'
+
+services:
+  # Database
+  postgres:
+    image: postgres:15
+    container_name: dcq-db
+    restart: always
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-dcq_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB:-dcq_db}
+    volumes:
+      - dcq_postgres_data:/var/lib/postgresql/data
+      - ./docker/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-dcq_user} -d ${POSTGRES_DB:-dcq_db}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # Redis for cache and message broker
+  redis:
+    image: redis:alpine
+    container_name: dcq-redis
+    restart: always
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # Backend API
+  api:
+    build: .
+    container_name: dcq-api
+    restart: always
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000
+    volumes:
+      - ./logs:/app/logs
+    ports:
+      - "8000:8000"
+    depends_on:
+      - postgres
+      - redis
+    env_file:
+      - .env.production
+    environment:
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-dcq_user}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-dcq_db}
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - REDIS_URL=redis://redis:6379/0
+
+  # Frontend
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        - VITE_API_URL=/api
+    container_name: dcq-frontend
+    restart: always
+    volumes:
+      - /etc/letsencrypt:/etc/letsencrypt:ro
+    ports:
+      - "443:443"
+      - "80:80"
+    depends_on:
+      - api
+
+  # Worker for email tasks
+  celery_worker_emails:
+    build: .
+    container_name: dcq-worker-emails
+    restart: always
+    command: celery -A app.core.celery_app.celery_app worker -Q emails -n worker.emails@%h --loglevel=info
+    volumes:
+      - ./logs:/app/logs
+    depends_on:
+      - redis
+      - postgres
+    env_file:
+      - .env.production
+    environment:
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-dcq_user}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-dcq_db}
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - REDIS_URL=redis://redis:6379/0
+
+  # Worker for content processing tasks
+  celery_worker_content:
+    build: .
+    container_name: dcq-worker-content
+    restart: always
+    command: celery -A app.core.celery_app.celery_app worker -Q content -n worker.content@%h --loglevel=info
+    volumes:
+      - ./logs:/app/logs
+    depends_on:
+      - redis
+      - postgres
+    env_file:
+      - .env.production
+    environment:
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-dcq_user}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-dcq_db}
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - REDIS_URL=redis://redis:6379/0
+
+  # Default worker for maintenance and other tasks
+  celery_worker_default:
+    build: .
+    container_name: dcq-worker-default
+    restart: always
+    command: celery -A app.core.celery_app.celery_app worker -Q default -n worker.default@%h --loglevel=info
+    volumes:
+      - ./logs:/app/logs
+    depends_on:
+      - redis
+      - postgres
+    env_file:
+      - .env.production
+    environment:
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-dcq_user}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-dcq_db}
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - REDIS_URL=redis://redis:6379/0
+
+  # Celery Beat for scheduled tasks
+  celery_beat:
+    build: .
+    container_name: dcq-beat
+    restart: always
+    command: celery -A app.core.celery_app.celery_app beat --loglevel=info
+    volumes:
+      - ./logs:/app/logs
+    depends_on:
+      - redis
+      - postgres
+      - celery_worker_default
+      - celery_worker_emails
+      - celery_worker_content
+    env_file:
+      - .env.production
+    environment:
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-dcq_user}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-dcq_db}
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - REDIS_URL=redis://redis:6379/0
+
+  # Flower for monitoring Celery tasks
+  celery_flower:
+    build: .
+    container_name: dcq-flower
+    restart: always
+    command: celery -A app.core.celery_app.celery_app flower --port=5555
+    ports:
+      - "5555:5555"
+    volumes:
+      - ./logs:/app/logs
+    depends_on:
+      - redis
+      - celery_worker_default
+      - celery_worker_emails
+      - celery_worker_content
+    env_file:
+      - .env.production
+    environment:
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-dcq_user}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-dcq_db}
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - REDIS_URL=redis://redis:6379/0
+
+volumes:
+  dcq_postgres_data:
+    name: dcq_postgres_data
+    driver: local
+  redis_data:
+    name: dcq_redis_data
+    driver: local

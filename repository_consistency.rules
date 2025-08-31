@@ -1,0 +1,61 @@
+## REPOSITORY_CONSISTENCY
+
+description: Rules to ensure consistency between repositories, models, and schemas
+globs: app/repositories/**, app/db/models/**, app/schemas/**
+filesToApplyRule: app/repositories/**, app/db/models/**, app/schemas/**
+alwaysApply: true
+
+---
+
+- **Repository-Model Consistency**
+
+  - Every model in `app/db/models` MUST have a corresponding repository in `app/repositories`
+  - Repository class names MUST follow the pattern `{ModelName}Repository`
+  - Repository classes MUST inherit from `BaseRepository` with proper generic type parameters
+  - Repository methods MUST use the correct model class and field names
+  - When a model is updated, its corresponding repository MUST be updated
+  - Repository methods MUST respect model constraints and relationships
+
+- **Repository-Schema Consistency**
+
+  - Repository create and update methods MUST use the correct schema classes
+  - Repository methods MUST handle all fields defined in schemas
+  - When a schema is updated, the corresponding repository methods MUST be updated
+  - Repository validation logic MUST be consistent with schema validation rules
+  - Repository return types MUST be compatible with schema definitions
+
+- **Repository Implementation Guidelines**
+
+  - Each repository MUST implement model-specific query methods
+  - Repositories MUST handle relationships between models correctly
+  - Repositories SHOULD implement methods for filtering, searching, and pagination
+  - Complex operations affecting multiple models SHOULD use transactions
+  - Repositories MUST handle errors and edge cases gracefully
+  - Repositories SHOULD include methods for common queries to avoid duplication in services
+
+- **Repository Update Process**
+
+  1. Update model in `app/db/models` if needed
+  2. Update corresponding schema in `app/schemas` if needed
+  3. Update repository methods to reflect model and schema changes
+  4. Add new repository methods for any new functionality
+  5. Ensure all repository methods handle relationships correctly
+  6. Test repository methods with unit tests
+
+- **Repository Review Checklist**
+
+  - Ensure repository methods use correct model and schema classes
+  - Verify that repository methods handle all model fields and relationships
+  - Check that repository methods implement proper error handling
+  - Confirm that repository methods use transactions for complex operations
+  - Validate that repository methods respect model constraints
+  - Make sure repository methods include proper documentation
+  - Ensure repository methods follow consistent naming conventions
+
+- **Integration with DB Schema Consistency**
+
+  - After verifying repository consistency, follow DB Schema Consistency rules
+  - Ensure models, schemas, and migrations remain in sync
+  - Apply the schema update process as defined in DB Schema Consistency rules
+  - Use the migration review checklist to prevent issues
+  - Maintain documentation of repository methods and their relationships to models

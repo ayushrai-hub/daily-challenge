@@ -1,0 +1,98 @@
+version: '3.9'
+
+services:
+  # Celery services configured to use Redis from main docker-compose.yml
+
+  # Worker for email tasks
+  celery_worker_emails:
+    build: .
+    container_name: dcq-worker-emails
+    restart: always
+    command: celery -A app.core.celery_app.celery_app worker -Q emails -n worker.emails@%h --loglevel=info
+    volumes:
+      - .:/app
+      - ./logs:/app/logs
+    env_file:
+      - .env
+      - .env.docker
+    extra_hosts:
+      - "host.docker.internal:host-gateway"  # This allows container to connect to host services
+
+  # Worker for content processing tasks
+  celery_worker_content:
+    build: .
+    container_name: dcq-worker-content
+    restart: always
+    command: celery -A app.core.celery_app.celery_app worker -Q content -n worker.content@%h --loglevel=info
+    volumes:
+      - .:/app
+      - ./logs:/app/logs
+    env_file:
+      - .env
+      - .env.docker
+    environment:
+      # AI provider keys
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - GEMINI_MODEL=${GEMINI_MODEL}
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+      - CLAUDE_MODEL=${CLAUDE_MODEL}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"  # This allows container to connect to host services
+
+  # Default worker for maintenance and other tasks
+  celery_worker_default:
+    build: .
+    container_name: dcq-worker-default
+    restart: always
+    command: celery -A app.core.celery_app.celery_app worker -Q default -n worker.default@%h --loglevel=info
+    volumes:
+      - .:/app
+      - ./logs:/app/logs
+    env_file:
+      - .env
+      - .env.docker
+    extra_hosts:
+      - "host.docker.internal:host-gateway"  # This allows container to connect to host services
+
+  # Celery Beat for scheduled tasks
+  celery_beat:
+    build: .
+    container_name: dcq-beat
+    restart: always
+    command: celery -A app.core.celery_app.celery_app beat --loglevel=info
+    volumes:
+      - .:/app
+      - ./logs:/app/logs
+    env_file:
+      - .env
+      - .env.docker
+    extra_hosts:
+      - "host.docker.internal:host-gateway"  # This allows container to connect to host services
+
+  # Flower for monitoring Celery tasks
+  celery_flower:
+    build: .
+    container_name: dcq-flower
+    restart: always
+    command: celery -A app.core.celery_app.celery_app flower --port=5555
+    ports:
+      - "5555:5555"
+    volumes:
+      - .:/app
+    depends_on:
+      - celery_worker_default
+      - celery_worker_emails
+      - celery_worker_content
+    # Use bridge networking (default) for Flower to allow port mapping
+    # This requires updating the Redis and PostgreSQL connections
+    environment:
+      # Connect to Redis from main docker-compose.yml
+      - REDIS_HOST=host.docker.internal
+      - REDIS_PORT=6379
+      - REDIS_URL=redis://host.docker.internal:6379/0
+      # For development: use connection to host PostgreSQL
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-dcq_user}:${POSTGRES_PASSWORD:-dcq_pass}@host.docker.internal:5433/${POSTGRES_DB:-dcq_db}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"  # This allows container to connect to host services
+
+# No volumes needed

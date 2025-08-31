@@ -1,0 +1,42 @@
+[
+  {
+    "id": 1,
+    "title": "Test Problem 1: Easy String Manipulation",
+    "difficulty": "easy",
+    "status": "approved",
+    "vetting_tier": "tier1_manual",
+    "created_at": "2025-04-04T17:31:42.558862"
+  },
+  {
+    "id": 2,
+    "title": "Test Problem 2: Medium Array Challenge",
+    "difficulty": "medium",
+    "status": "approved",
+    "vetting_tier": "tier2_ai",
+    "created_at": "2025-04-19T17:31:42.558862"
+  },
+  {
+    "id": 3,
+    "title": "Test Problem 3: Hard Dynamic Programming",
+    "difficulty": "hard",
+    "status": "archived",
+    "vetting_tier": "tier3_needs_review",
+    "created_at": "2025-03-20T17:31:42.558862"
+  },
+  {
+    "id": 4,
+    "title": "Test Problem 4: Recent Medium Problem",
+    "difficulty": "medium",
+    "status": "draft",
+    "vetting_tier": "tier2_ai",
+    "created_at": "2025-05-03T17:31:42.558862"
+  },
+  {
+    "id": 5,
+    "title": "Test Problem 5: Easy Array Problem",
+    "difficulty": "easy",
+    "status": "approved",
+    "vetting_tier": "tier1_manual",
+    "created_at": "2025-04-27T17:31:42.558862"
+  }
+]

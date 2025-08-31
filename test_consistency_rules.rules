@@ -1,0 +1,100 @@
+## TEST_CONSISTENCY
+
+description: Rules to ensure comprehensive and consistent testing of database models, schemas, and repositories
+globs: tests/**, app/db/models/**, app/repositories/**, app/schemas/**
+filesToApplyRule: tests/**, app/db/models/**, app/repositories/**, app/schemas/**
+alwaysApply: true
+
+---
+
+- **Test-Model Consistency**
+
+  - Every model in `app/db/models` MUST have corresponding test fixtures in `tests/conftest.py`
+  - Test fixtures MUST create model instances with valid data for all required fields
+  - Test fixtures MUST respect model constraints and relationships
+  - Test fixtures MUST be created in the correct order to satisfy foreign key dependencies
+  - When a model is updated, its corresponding test fixtures MUST be updated
+  - Test fixtures SHOULD cover edge cases and validation boundaries
+
+- **Test-Repository Consistency**
+
+  - Every repository in `app/repositories` MUST have a corresponding test file in `tests/repositories`
+  - Test files MUST follow the naming pattern `test_{model_name}_repository.py`
+  - Each repository method MUST have at least one corresponding test function
+  - Test functions MUST verify both success cases and failure/edge cases
+  - When a repository method is updated, its corresponding tests MUST be updated
+  - Tests MUST verify that repository methods respect model constraints and relationships
+
+- **Test-Schema Consistency**
+
+  - Schema validation rules MUST be tested with both valid and invalid data
+  - Tests MUST verify that schemas correctly validate model constraints
+  - When a schema is updated, its corresponding validation tests MUST be updated
+  - Tests SHOULD cover all validation rules defined in schemas
+
+- **Test Implementation Guidelines**
+
+  - Tests MUST use isolated database sessions to prevent test interference
+  - Tests MUST run in transactions that are rolled back after each test
+  - Tests SHOULD NOT depend on the order of execution
+  - Tests MUST clean up any resources they create
+  - Tests SHOULD be atomic and test one specific functionality
+  - Tests SHOULD have clear, descriptive names that indicate what is being tested
+  - Tests SHOULD include proper documentation explaining the test purpose
+
+- **Test Coverage Requirements**
+
+  - Base CRUD operations (create, read, update, delete) MUST be tested for all repositories
+  - Model-specific query methods MUST be tested with various parameters
+  - Relationship handling MUST be tested for all model relationships
+  - Pagination, filtering, and sorting MUST be tested where implemented
+  - Error handling and edge cases MUST be tested for all repository methods
+  - Transaction management MUST be tested for operations affecting multiple models
+
+- **Test Execution Sequence**
+
+  1. Test database setup and connection
+  2. Test model creation and validation
+  3. Test base repository operations (BaseRepository)
+  4. Test model-specific repositories in dependency order:
+     - First test repositories for models without foreign key dependencies
+     - Then test repositories for models with dependencies, following the relationship chain
+  5. Test complex operations involving multiple repositories
+  6. Test error handling and edge cases
+
+- **Test Database Setup**
+
+  - Tests MUST use a separate test database, not the development or production database
+  - Test database MUST have the same schema as the development database
+  - Test database MUST be initialized with the latest migrations before running tests
+  - Test database SHOULD be reset to a clean state between test runs
+  - Docker-based test database SHOULD be used for consistent testing environments
+
+- **Test Review Checklist**
+
+  - Verify that all model fields are covered in tests
+  - Ensure all repository methods have corresponding tests
+  - Check that tests verify both success and failure cases
+  - Confirm that tests handle relationships correctly
+  - Validate that tests cover pagination, filtering, and sorting
+  - Make sure tests include proper assertions and error handling
+  - Ensure tests are independent and don't rely on specific execution order
+
+- **Integration with Repository and Schema Consistency**
+
+  - After implementing new models or repositories, follow this testing sequence:
+    1. Update model according to DB Schema Consistency rules
+    2. Update schema according to DB Schema Consistency rules
+    3. Update repository according to Repository Consistency rules
+    4. Update or create test fixtures for the model
+    5. Update or create tests for the repository methods
+    6. Run tests to verify all operations work correctly
+    7. Verify test coverage meets the requirements
+
+- **Continuous Integration Guidelines**
+
+  - Tests SHOULD run automatically on code changes
+  - Tests MUST pass before merging code changes
+  - Test coverage SHOULD be monitored and maintained at a high level
+  - Test performance SHOULD be optimized to keep the test suite fast
+  - Test results SHOULD be clearly reported with actionable feedback

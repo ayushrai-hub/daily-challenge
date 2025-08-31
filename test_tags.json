@@ -1,0 +1,37 @@
+[
+  {
+    "name": "python",
+    "description": "Python programming language",
+    "tag_type": "language",
+    "is_featured": true,
+    "is_private": false
+  },
+  {
+    "name": "fastapi",
+    "description": "FastAPI web framework",
+    "tag_type": "framework",
+    "is_featured": false,
+    "is_private": false
+  },
+  {
+    "name": "sqlalchemy",
+    "description": "SQLAlchemy ORM library",
+    "tag_type": "tool",
+    "is_featured": false,
+    "is_private": false
+  },
+  {
+    "name": "testing",
+    "description": "Testing and test automation",
+    "tag_type": "topic",
+    "is_featured": false,
+    "is_private": false
+  },
+  {
+    "name": "algorithms",
+    "description": "Algorithmic problem solving",
+    "tag_type": "concept",
+    "is_featured": false,
+    "is_private": false
+  }
+]

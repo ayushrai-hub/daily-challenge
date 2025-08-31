@@ -1,0 +1,27 @@
+version: '3.9'
+
+services:
+  # Single worker for content processing tasks - isolated for development
+  celery_worker_content:
+    build: .
+    container_name: dcq-content-dev
+    restart: always
+    command: celery -A app.core.celery_app.celery_app worker -Q content -n worker.content@%h --loglevel=debug
+    volumes:
+      - .:/app
+      - ./logs:/app/logs
+    network_mode: "host"
+    env_file:
+      - .env
+    environment:
+      # Connect to Redis from main docker-compose.yml (running on localhost)
+      - REDIS_HOST=localhost
+      - REDIS_PORT=6379
+      - REDIS_URL=redis://localhost:6379/0
+      # For development: use connection to host PostgreSQL
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-dcq_user}:${POSTGRES_PASSWORD:-dcq_pass}@localhost:5433/${POSTGRES_DB:-dcq_db}
+      # AI provider keys - explicitly set for testing
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - GEMINI_MODEL=gemini-1.5-pro
+      # Debug mode for more verbose logging
+      - LOG_LEVEL=DEBUG

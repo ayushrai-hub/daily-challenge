@@ -1,0 +1,41 @@
+fastapi
+uvicorn
+sqlalchemy
+psycopg2-binary
+pydantic
+python-jose[cryptography]
+passlib[bcrypt]
+python-multipart
+httpx
+pytest
+pytest-asyncio
+# Email
+resend>=1.0.0
+python-dotenv>=1.0.0
+email-validator>=2.0.0
+alembic
+python-json-logger
+pydantic-settings
+pytest
+requests
+email-validator
+redis
+slowapi
+celery
+flower  # Celery monitoring tool
+resend
+celery[redis]
+gevent>=23.9.0  # For async task support in Celery
+markdown
+bleach
+pygments
+beautifulsoup4
+pymdown-extensions
+
+# AI Content Pipeline
+google-generativeai>=0.3.0  # Google Gemini API
+anthropic>=0.5.0  # Claude API (for future use)
+asyncio
+jmespath  # For JSON parsing
+asyncpg  # Async PostgreSQL driver
+bs4  # For HTML parsing in StackOverflow content

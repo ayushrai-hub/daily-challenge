@@ -1,0 +1,57 @@
+[
+  {
+    "id": 1,
+    "source_platform": "stackoverflow",
+    "source_identifier": "test-so-123456",
+    "source_url": "https://stackoverflow.com/questions/123456",
+    "source_title": "Test StackOverflow Question 1",
+    "processing_status": "processed",
+    "ingested_at": "2025-04-29T17:31:42.605458",
+    "processed_at": "2025-04-30T17:31:42.605458",
+    "created_at": "2025-04-29T17:31:42.605458"
+  },
+  {
+    "id": 2,
+    "source_platform": "gh_issues",
+    "source_identifier": "test-gh-789",
+    "source_url": "https://github.com/org/repo/issues/789",
+    "source_title": "Test GitHub Issue 789",
+    "processing_status": "pending",
+    "ingested_at": "2025-05-01T17:31:42.605458",
+    "processed_at": null,
+    "created_at": "2025-05-01T17:31:42.605458"
+  },
+  {
+    "id": 3,
+    "source_platform": "blog",
+    "source_identifier": "test-blog-xyz",
+    "source_url": "https://techblog.example.com/article123",
+    "source_title": "Test Blog Article on Algorithm Complexity",
+    "processing_status": "failed",
+    "ingested_at": "2025-04-24T17:31:42.605458",
+    "processed_at": "2025-04-24T17:31:42.605458",
+    "created_at": "2025-04-24T17:31:42.605458"
+  },
+  {
+    "id": 4,
+    "source_platform": "reddit",
+    "source_identifier": "test-reddit-abc",
+    "source_url": "https://reddit.com/r/programming/comments/abc",
+    "source_title": "Test Reddit Post on Backend Development",
+    "processing_status": "processed",
+    "ingested_at": "2025-05-04T05:31:42.605458",
+    "processed_at": null,
+    "created_at": "2025-05-04T05:31:42.605458"
+  },
+  {
+    "id": 5,
+    "source_platform": "hackernews",
+    "source_identifier": "test-hn-24680",
+    "source_url": "https://news.ycombinator.com/item?id=24680",
+    "source_title": "Test HN Post on AI Algorithms",
+    "processing_status": "pending",
+    "ingested_at": "2025-05-04T15:31:42.605458",
+    "processed_at": null,
+    "created_at": "2025-05-04T15:31:42.605458"
+  }
+]
